@@ -108,18 +108,61 @@ namespace Lexicon.Core.Tests
         [Test]
         public void When_direction_is_native_to_foreign_and_answer_to_the_exercise_is_correct_AcceptAnswer_returns_true()
         {
-            _exerciseDispatcher.AddLesson(new Lesson("name") { Id = 1, 
-                Words = new List<WordPair>
-                {
-                    new WordPair(new Word("native"), new Word("foreign")) { PairId = 1 }
-                } 
-            });
+            _exerciseDispatcher.AddLesson(createLesson(1, "name", new { nw = "native", fw = "foreign", id = 1 }));
             var exercise = new Exercise(1, 1, "native", ExerciseDirection.NativeToForeign);
 
+            //act
             exercise.Answer = "foreign";
             bool correct = _exerciseDispatcher.AcceptAnswer(exercise);
 
             Assert.IsTrue(correct);
+        }
+
+        [Test]
+        public void When_direction_is_foreign_to_native_and_answer_to_the_exercise_is_correct_AcceptAnswer_returns_true()
+        {
+            _exerciseDispatcher.AddLesson(createLesson(1, "name", new { nw = "native", fw = "foreign", id = 1 }));
+            var exercise = new Exercise(1, 1, "foreign", ExerciseDirection.ForeignToNative);
+
+            //act
+            exercise.Answer = "native";
+            bool correct = _exerciseDispatcher.AcceptAnswer(exercise);
+
+            Assert.IsTrue(correct);
+        }
+
+        [Test]
+        public void When_direction_is_native_to_foreign_and_answer_to_the_exercise_is_NOT_correct_AcceptAnswer_returns_false()
+        {
+            _exerciseDispatcher.AddLesson(createLesson(1, "name", new { nw = "native", fw = "foreign", id = 1 }));
+            var exercise = new Exercise(1, 1, "native", ExerciseDirection.NativeToForeign);
+
+            //act
+            exercise.Answer = "unknown";
+            bool correct = _exerciseDispatcher.AcceptAnswer(exercise);
+
+            Assert.IsFalse(correct);
+        }
+
+        [Test]
+        public void When_direction_is_foreign_to_native_and_answer_to_the_exercise_is_NOT_correct_AcceptAnswer_returns_false()
+        {
+            _exerciseDispatcher.AddLesson(createLesson(1, "name", new { nw = "native", fw = "foreign", id = 1 }));
+            var exercise = new Exercise(1, 1, "foreign", ExerciseDirection.ForeignToNative);
+
+            //act
+            exercise.Answer = "unknown";
+            bool correct = _exerciseDispatcher.AcceptAnswer(exercise);
+
+            Assert.IsFalse(correct);
+        }
+
+        private Lesson createLesson(long lessonId, string lessonName, params dynamic[] wordPairs)
+        {
+            var lesson = new Lesson(lessonName) {Id = lessonId};
+            foreach(var p in wordPairs)
+                lesson.Words.Add(new WordPair(new Word(p.nw), new Word(p.fw)) { PairId = p.id });
+            return lesson;
         }
     }
 }
