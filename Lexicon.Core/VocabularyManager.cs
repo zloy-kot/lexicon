@@ -7,39 +7,15 @@ using Lexicon.Common;
 
 namespace Lexicon.Core
 {
-    public class VocabularyManager
+    public class VocabularyManager : IVocabularyManager
     {
-        private readonly IStorage _storage;
+        private readonly IVocabularyRepository _vocabularyRepository;
         private readonly IImporter[] _importers;
 
-        public VocabularyManager(IStorage storage, params IImporter[] importers)
+        public VocabularyManager(IVocabularyRepository vocabularyRepository, params IImporter[] importers)
         {
-            _storage = Ensure.IsNotNull(storage);
+            _vocabularyRepository = Ensure.IsNotNull(vocabularyRepository);
             _importers = Ensure.IsNotNull(importers);
-
-            Lessons = new List<Lesson>();
-        }
-
-        internal IList<Lesson> Lessons { get; set; }
-
-        public void AddLesson(Lesson lesson)
-        {
-            Ensure.IsNotNull(lesson);
-
-            Lessons.Add(lesson);
-
-            _storage.SaveLesson(lesson);
-        }
-
-        public Lesson GetCurrentLesson()
-        {
-            var current = Lessons.FirstOrDefault(x => x.IsCurrent);
-            return current ?? Lessons.FirstOrDefault();
-        }
-
-        public IList<Lesson> GetAllLessons()
-        {
-            return Lessons;
         }
     }
 }

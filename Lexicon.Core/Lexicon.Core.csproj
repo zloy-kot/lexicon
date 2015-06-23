@@ -39,6 +39,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Exercise.cs" />
+    <Compile Include="IVocabularyManager.cs" />
+    <Compile Include="LessonDispatcher.cs" />
     <Compile Include="VocabularyManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

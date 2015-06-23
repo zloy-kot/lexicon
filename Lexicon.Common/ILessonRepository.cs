@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Lexicon.Common
 {
-    public interface IStorage
+    public interface ILessonRepository
     {
-        void SaveLesson(Lesson lesson);
+        void Save(Lesson lesson);
     }
 }

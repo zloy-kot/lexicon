@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Lexicon.Common
+﻿namespace Lexicon.Core
 {
     public class Exercise
     {
-        public Exercise(string word, ExerciseDirection direction)
+        public Exercise(long lessonId, long wordPairId, string word, ExerciseDirection direction)
         {
+            LessonId = lessonId;
+            WordPairId = wordPairId;
             Word = word;
             Direction = direction;
         }
+
+        internal long LessonId { get; private set; }
+
+        internal long WordPairId { get; private set; }
 
         public string Word { get; private set; }
 

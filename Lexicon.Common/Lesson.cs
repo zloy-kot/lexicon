@@ -11,13 +11,15 @@ namespace Lexicon.Common
         public Lesson(string name)
         {
             Name = Ensure.IsNullOrWhiteSpace(name);
-            Words = new List<Word>();
+            Words = new List<WordPair>();
         }
+
+        public long Id { get; set; }
 
         public string Name { get; set; }
 
         public bool IsCurrent { get; set; }
 
-        public IList<Word> Words { get; set; }
+        public IList<WordPair> Words { get; set; }
     }
 }

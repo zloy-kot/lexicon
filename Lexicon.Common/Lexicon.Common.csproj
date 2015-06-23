@@ -40,12 +40,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Ensure.cs" />
-    <Compile Include="Exercise.cs" />
     <Compile Include="IImporter.cs" />
-    <Compile Include="IStorage.cs" />
+    <Compile Include="ILessonRepository.cs" />
+    <Compile Include="IVocabularyRepository.cs" />
     <Compile Include="Lesson.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Word.cs" />
+    <Compile Include="WordPair.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
