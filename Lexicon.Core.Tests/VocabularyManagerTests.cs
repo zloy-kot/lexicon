@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net.Sockets;
@@ -159,6 +160,53 @@ namespace Lexicon.Core.Tests
 
             var foreigns = _vocabularyManager.ForeignWords.Select(x => x.Value);
             CollectionAssertEx.ContainsOnly(foreigns, "problem", "task");
+        }
+
+        [Test]
+        public void When_a_native_with_foreigns_is_defined_GetWordPairs_returns_collections_of_word_pairs_defined_for_that_native()
+        {
+            string native = "проблема";
+            string[] foreigns = {"problem", "task"};
+            _vocabularyManager.CreateWord(createWordDefinition(native, foreigns));
+
+            IList<WordPair> pairs = _vocabularyManager.GetWordPairs(native);
+            var actual = pairs.Select(x => x.ForeignWord.Value);
+
+            CollectionAssertEx.ContainsOnly(actual, foreigns);
+        }
+
+        [Test]
+        public void When_multiple_natives_with_their_foreigns_defined_GetWordPairs_returns_collections_of_word_pairs_defined_for_specified_native()
+        {
+            string native1 = "проблема";
+            string[] foreigns1 = { "problem" };
+            _vocabularyManager.CreateWord(createWordDefinition(native1, foreigns1));
+
+            string native2 = "задача";
+            string[] foreigns2 = { "problem", "objective", "task", "goal" };
+            _vocabularyManager.CreateWord(createWordDefinition(native2, foreigns2));
+
+            IList<WordPair> pairs = _vocabularyManager.GetWordPairs(native2);
+            var actual = pairs.Select(x => x.ForeignWord.Value);
+
+            CollectionAssertEx.ContainsOnly(actual, foreigns2);
+        }
+
+        [Test]
+        public void When_no_word_is_found_GetWordPairs_returns_empty_collection()
+        {
+            IList<WordPair> pairs = _vocabularyManager.GetWordPairs("test");
+
+            Assert.IsNotNull(pairs);
+            CollectionAssert.IsEmpty(pairs);
+        }
+
+        private WordDefinition createWordDefinition(string native, params string[] foreigns)
+        {
+            var wordDef = new WordDefinition(native);
+            foreach (var f in foreigns)
+                wordDef.Translations.Add(f);
+            return wordDef;
         }
     }
 }

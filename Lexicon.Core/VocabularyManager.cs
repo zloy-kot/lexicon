@@ -38,6 +38,9 @@ namespace Lexicon.Core
             }
         }
 
-        //public WordDefinition CheckOccurence()?
+        public IList<WordPair> GetWordPairs(string word)
+        {
+            return WordPairs.Where(x => x.NativeWord.Value.Equals(word)).ToList();
+        }
     }
 }
