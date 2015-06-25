@@ -24,6 +24,7 @@
     public enum ExerciseDirection
     {
         NativeToForeign,
-        ForeignToNative
+        ForeignToNative,
+        BothDirections
     }
 }

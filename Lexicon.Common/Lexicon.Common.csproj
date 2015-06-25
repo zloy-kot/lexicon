@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Ensure.cs" />
+    <Compile Include="ExerciseSelectionException.cs" />
     <Compile Include="IImporter.cs" />
     <Compile Include="ILessonRepository.cs" />
     <Compile Include="IVocabularyRepository.cs" />
