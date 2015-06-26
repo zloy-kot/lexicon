@@ -36,13 +36,20 @@ namespace Lexicon.Core
             {
                 var native = resolveWord(NativeWords, wordDefinition.NativeWord);
                 var foreign = resolveWord(ForeignWords, tran);
-                WordPairs.Add(new WordPair(native, foreign));
+
+                if (!isPairExist(native, foreign))
+                    WordPairs.Add(new WordPair(native, foreign));
             }
         }
 
         public IList<WordPair> GetWordPairs(string word)
         {
             return WordPairs.Where(x => _wordComparisonStrategy.IsMatch(x.NativeWord, word)).ToList();
+        }
+
+        private bool isPairExist(Word native, Word foreign)
+        {
+            return WordPairs.Any(x => x.NativeWord == native && x.ForeignWord == foreign);
         }
 
         private Word resolveWord(ICollection<Word> collection, string value)

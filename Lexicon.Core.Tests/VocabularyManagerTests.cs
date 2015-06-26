@@ -47,14 +47,14 @@ namespace Lexicon.Core.Tests
             _vocabularyManager.CreateWord(wordDef);
 
             //assert
-            var pairs = _vocabularyManager.WordPairs.Where(x => x.NativeWord.Value.Equals("тест")).Select(x => x.ForeignWord.Value);
+            var pairs = _vocabularyManager.WordPairs.ForeignsFor("тест");
             CollectionAssertEx.ContainsOnly(pairs, "test");
 
-            var native = _vocabularyManager.NativeWords.SingleOrDefault(x => x.Value.Equals("тест"));
-            Assert.IsNotNull(native);
+            var native = _vocabularyManager.NativeWords.AllValues();
+            CollectionAssertEx.ContainsOnly(native, "тест");
 
-            var foreign = _vocabularyManager.ForeignWords.SingleOrDefault(x => x.Value.Equals("test"));
-            Assert.IsNotNull(foreign);
+            var foreign = _vocabularyManager.ForeignWords.AllValues();
+            CollectionAssertEx.ContainsOnly(foreign, "test");
         }
 
         [Test]
@@ -68,13 +68,13 @@ namespace Lexicon.Core.Tests
             _vocabularyManager.CreateWord(wordDef);
 
             //assert
-            var pairs = _vocabularyManager.WordPairs.Where(x => x.NativeWord.Value.Equals("задача")).Select(x => x.ForeignWord.Value);
+            var pairs = _vocabularyManager.WordPairs.ForeignsFor("задача");
             CollectionAssertEx.ContainsOnly(pairs, tran);
 
-            var natives = _vocabularyManager.NativeWords.Where(x => x.Value.Equals("задача")).Select(x => x.Value);
+            var natives = _vocabularyManager.NativeWords.AllValues();
             CollectionAssertEx.ContainsOnly(natives, "задача");
 
-            var foreigns = _vocabularyManager.ForeignWords.Select(x => x.Value);
+            var foreigns = _vocabularyManager.ForeignWords.AllValues();
             CollectionAssertEx.ContainsOnly(foreigns, tran);
         }
 
@@ -93,14 +93,38 @@ namespace Lexicon.Core.Tests
             _vocabularyManager.CreateWord(wordDef2);
 
             //assert
-            var pairs = _vocabularyManager.WordPairs.Where(x => x.NativeWord.Value.Equals("задача")).Select(x => x.ForeignWord.Value);
+            var pairs = _vocabularyManager.WordPairs.ForeignsFor("задача");
             CollectionAssertEx.ContainsOnly(pairs, "problem", "objective", "task");
 
-            var natives = _vocabularyManager.NativeWords.Where(x => x.Value.Equals("задача")).Select(x => x.Value);
+            var natives = _vocabularyManager.NativeWords.AllValues();
             CollectionAssertEx.ContainsOnly(natives, "задача");
 
-            var foreigns = _vocabularyManager.ForeignWords.Select(x => x.Value);
+            var foreigns = _vocabularyManager.ForeignWords.AllValues();
             CollectionAssertEx.ContainsOnly(foreigns, "problem", "objective", "task");
+        }
+
+        [Test]
+        public void When_two_WordDefinitions_for_same_natives_with_one_same_foreignCrateWord_adds_single_native_single_foreign_and_single_pair()
+        {
+            var wordDef1 = new WordDefinition("задача");
+            wordDef1.Translations.Add("problem");
+
+            _vocabularyManager.CreateWord(wordDef1);
+
+            var wordDef2 = new WordDefinition("задача");
+            wordDef2.Translations.Add("problem");
+
+            _vocabularyManager.CreateWord(wordDef2);
+
+            //assert
+            var pairs = _vocabularyManager.WordPairs.ForeignsFor("задача");
+            CollectionAssertEx.ContainsOnly(pairs, "problem");
+
+            var natives = _vocabularyManager.NativeWords.AllValues();
+            CollectionAssertEx.ContainsOnly(natives, "задача");
+
+            var foreigns = _vocabularyManager.ForeignWords.AllValues();
+            CollectionAssertEx.ContainsOnly(foreigns, "problem");
         }
 
         [Test]
@@ -118,19 +142,16 @@ namespace Lexicon.Core.Tests
             _vocabularyManager.CreateWord(wordDef2);
 
             //assert
-            var pairs1 = _vocabularyManager.WordPairs.Where(x => x.NativeWord.Value.Equals("тест")).Select(x => x.ForeignWord.Value);
+            var pairs1 = _vocabularyManager.WordPairs.ForeignsFor("тест");
             CollectionAssertEx.ContainsOnly(pairs1, "test");
 
-            var pairs2 = _vocabularyManager.WordPairs.Where(x => x.NativeWord.Value.Equals("задача")).Select(x => x.ForeignWord.Value);
+            var pairs2 = _vocabularyManager.WordPairs.ForeignsFor("задача");
             CollectionAssertEx.ContainsOnly(pairs2, "objective", "task");
 
-            var natives1 = _vocabularyManager.NativeWords.Where(x => x.Value.Equals("тест")).Select(x => x.Value);
-            CollectionAssertEx.ContainsOnly(natives1, "тест");
+            var natives1 = _vocabularyManager.NativeWords.AllValues();
+            CollectionAssertEx.ContainsOnly(natives1, "тест", "задача");
 
-            var natives2 = _vocabularyManager.NativeWords.Where(x => x.Value.Equals("задача")).Select(x => x.Value);
-            CollectionAssertEx.ContainsOnly(natives2, "задача");
-
-            var foreigns = _vocabularyManager.ForeignWords.Select(x => x.Value);
+            var foreigns = _vocabularyManager.ForeignWords.AllValues();
             CollectionAssertEx.ContainsOnly(foreigns, "test", "objective", "task");
         }
 
@@ -149,20 +170,52 @@ namespace Lexicon.Core.Tests
             _vocabularyManager.CreateWord(wordDef2);
 
             //assert
-            var pairs1 = _vocabularyManager.WordPairs.Where(x => x.NativeWord.Value.Equals("проблема")).Select(x => x.ForeignWord.Value);
+            var pairs1 = _vocabularyManager.WordPairs.ForeignsFor("проблема");
             CollectionAssertEx.ContainsOnly(pairs1, "problem");
 
-            var pairs2 = _vocabularyManager.WordPairs.Where(x => x.NativeWord.Value.Equals("задача")).Select(x => x.ForeignWord.Value);
+            var pairs2 = _vocabularyManager.WordPairs.ForeignsFor("задача");
             CollectionAssertEx.ContainsOnly(pairs2, "problem", "task");
 
-            var natives1 = _vocabularyManager.NativeWords.Where(x => x.Value.Equals("проблема")).Select(x => x.Value);
-            CollectionAssertEx.ContainsOnly(natives1, "проблема");
+            var natives1 = _vocabularyManager.NativeWords.AllValues();
+            CollectionAssertEx.ContainsOnly(natives1, "проблема", "задача");
 
-            var natives2 = _vocabularyManager.NativeWords.Where(x => x.Value.Equals("задача")).Select(x => x.Value);
-            CollectionAssertEx.ContainsOnly(natives2, "задача");
-
-            var foreigns = _vocabularyManager.ForeignWords.Select(x => x.Value);
+            var foreigns = _vocabularyManager.ForeignWords.AllValues();
             CollectionAssertEx.ContainsOnly(foreigns, "problem", "task");
+        }
+
+        [Test]
+        public void When_three_WordDefinitions_for_three_different_natives_with_one_foreign_CreateWord_adds_three_natives_three_pairs_and_one_foreign()
+        {
+            var wordDef1 = new WordDefinition("проблема");
+            wordDef1.Translations.Add("problem");
+
+            _vocabularyManager.CreateWord(wordDef1);
+
+            var wordDef2 = new WordDefinition("задача");
+            wordDef2.Translations.Add("problem");
+
+            _vocabularyManager.CreateWord(wordDef2);
+
+            var wordDef3 = new WordDefinition("трудный");
+            wordDef3.Translations.Add("problem");
+
+            _vocabularyManager.CreateWord(wordDef3);
+
+            //assert
+            var pairs1 = _vocabularyManager.WordPairs.ForeignsFor("проблема");
+            CollectionAssertEx.ContainsOnly(pairs1, "problem");
+
+            var pairs2 = _vocabularyManager.WordPairs.ForeignsFor("задача");
+            CollectionAssertEx.ContainsOnly(pairs2, "problem");
+
+            var pairs3 = _vocabularyManager.WordPairs.ForeignsFor("трудный");
+            CollectionAssertEx.ContainsOnly(pairs3, "problem");
+
+            var natives = _vocabularyManager.NativeWords.AllValues();
+            CollectionAssertEx.ContainsOnly(natives, "проблема", "задача", "трудный");
+
+            var foreigns = _vocabularyManager.ForeignWords.AllValues();
+            CollectionAssertEx.ContainsOnly(foreigns, "problem");
         }
 
         [Test]
