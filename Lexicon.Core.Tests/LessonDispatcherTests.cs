@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Lexicon.Common;
 using NSubstitute;
 using NUnit.Framework;
@@ -7,17 +7,27 @@ using NUnit.Framework;
 namespace Lexicon.Core.Tests
 {
     [TestFixture]
+    [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
     public class LessonDispatcherTests
     {
         private ILessonRepository _lessonRepository;
         private LessonDispatcher _exerciseDispatcher;
+        private IWordComparisonStrategy _wordComparisonStrategy;
 
         [SetUp]
         public void SetUp()
         {
             _lessonRepository = Substitute.For<ILessonRepository>();
+            _wordComparisonStrategy = Substitute.For<IWordComparisonStrategy>();
 
-            _exerciseDispatcher = new LessonDispatcher(_lessonRepository);
+            _exerciseDispatcher = new LessonDispatcher(_lessonRepository, _wordComparisonStrategy);
+        }
+
+        [Test]
+        public void ctor_throws_ArgumentNullException_if_nulls_passed()
+        {
+            Assert.Throws<ArgumentNullException>(() => new LessonDispatcher(Substitute.For<ILessonRepository>(), null));
+            Assert.Throws<ArgumentNullException>(() => new LessonDispatcher(null, Substitute.For<IWordComparisonStrategy>()));
         }
 
         [Test]
@@ -108,6 +118,7 @@ namespace Lexicon.Core.Tests
         [Test]
         public void When_direction_is_native_to_foreign_and_answer_to_the_exercise_is_correct_AcceptAnswer_returns_true()
         {
+            _wordComparisonStrategy.IsMatch(Arg.Any<Word>(), Arg.Any<string>()).Returns(true);
             _exerciseDispatcher.AddLesson(createLesson(1, "name", new { nw = "native", fw = "foreign", id = 1 }));
             var exercise = new Exercise(1, 1, "native", ExerciseDirection.NativeToForeign);
 
@@ -121,6 +132,7 @@ namespace Lexicon.Core.Tests
         [Test]
         public void When_direction_is_foreign_to_native_and_answer_to_the_exercise_is_correct_AcceptAnswer_returns_true()
         {
+            _wordComparisonStrategy.IsMatch(Arg.Any<Word>(), Arg.Any<string>()).Returns(true);
             _exerciseDispatcher.AddLesson(createLesson(1, "name", new { nw = "native", fw = "foreign", id = 1 }));
             var exercise = new Exercise(1, 1, "foreign", ExerciseDirection.ForeignToNative);
 
@@ -134,6 +146,7 @@ namespace Lexicon.Core.Tests
         [Test]
         public void When_direction_is_native_to_foreign_and_answer_to_the_exercise_is_NOT_correct_AcceptAnswer_returns_false()
         {
+            _wordComparisonStrategy.IsMatch(Arg.Any<Word>(), Arg.Any<string>()).Returns(false);
             _exerciseDispatcher.AddLesson(createLesson(1, "name", new { nw = "native", fw = "foreign", id = 1 }));
             var exercise = new Exercise(1, 1, "native", ExerciseDirection.NativeToForeign);
 
@@ -147,6 +160,7 @@ namespace Lexicon.Core.Tests
         [Test]
         public void When_direction_is_foreign_to_native_and_answer_to_the_exercise_is_NOT_correct_AcceptAnswer_returns_false()
         {
+            _wordComparisonStrategy.IsMatch(Arg.Any<Word>(), Arg.Any<string>()).Returns(false);
             _exerciseDispatcher.AddLesson(createLesson(1, "name", new { nw = "native", fw = "foreign", id = 1 }));
             var exercise = new Exercise(1, 1, "foreign", ExerciseDirection.ForeignToNative);
 

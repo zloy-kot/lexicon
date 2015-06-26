@@ -28,7 +28,7 @@ namespace Lexicon.Common
             return value;
         }
 
-        public static string IsNullOrWhiteSpace(string value)
+        public static string IsNotNullNorWhiteSpace(string value)
         {
             if (String.IsNullOrWhiteSpace(value))
                 throw new ArgumentNullException();

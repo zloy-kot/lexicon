@@ -39,12 +39,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DefaultWordComparisonStrategy.cs" />
     <Compile Include="Exercise.cs" />
     <Compile Include="IVocabularyManager.cs" />
     <Compile Include="LessonDispatcher.cs" />
     <Compile Include="VocabularyManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WordCollectionExtensions.cs" />
     <Compile Include="WordDefinition.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,4 +1,6 @@
-﻿namespace Lexicon.Common
+﻿using System;
+
+namespace Lexicon.Common
 {
     public class Word
     {
@@ -12,5 +14,10 @@
         public string Value { get; set; }
 
         public string LangCode { get; set; }
+
+        public override string ToString()
+        {
+            return String.IsNullOrWhiteSpace(LangCode) ? Value : String.Format("[{0}] {1}", LangCode, Value);
+        }
     }
 }

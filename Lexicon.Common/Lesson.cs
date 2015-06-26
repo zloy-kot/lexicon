@@ -10,7 +10,7 @@ namespace Lexicon.Common
     {
         public Lesson(string name)
         {
-            Name = Ensure.IsNullOrWhiteSpace(name);
+            Name = Ensure.IsNotNullNorWhiteSpace(name);
             Words = new List<WordPair>();
         }
 

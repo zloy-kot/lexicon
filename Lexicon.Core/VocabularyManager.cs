@@ -9,11 +9,13 @@ namespace Lexicon.Core
 {
     public class VocabularyManager : IVocabularyManager
     {
+        private readonly IWordComparisonStrategy _wordComparisonStrategy;
         private readonly IVocabularyRepository _vocabularyRepository;
         private readonly IImporter[] _importers;
 
-        public VocabularyManager(IVocabularyRepository vocabularyRepository, params IImporter[] importers)
+        public VocabularyManager(IVocabularyRepository vocabularyRepository, IWordComparisonStrategy wordComparisonStrategy, params IImporter[] importers)
         {
+            _wordComparisonStrategy = Ensure.IsNotNull(wordComparisonStrategy);
             _vocabularyRepository = Ensure.IsNotNull(vocabularyRepository);
             _importers = Ensure.IsNotNull(importers);
 
@@ -32,15 +34,26 @@ namespace Lexicon.Core
         {
             foreach (var tran in wordDefinition.Translations)
             {
-                var native = NativeWords.ResolveWord(wordDefinition.NativeWord);
-                var foreign = ForeignWords.ResolveWord(tran);
+                var native = resolveWord(NativeWords, wordDefinition.NativeWord);
+                var foreign = resolveWord(ForeignWords, tran);
                 WordPairs.Add(new WordPair(native, foreign));
             }
         }
 
         public IList<WordPair> GetWordPairs(string word)
         {
-            return WordPairs.Where(x => x.NativeWord.Value.Equals(word)).ToList();
+            return WordPairs.Where(x => _wordComparisonStrategy.IsMatch(x.NativeWord, word)).ToList();
+        }
+
+        private Word resolveWord(ICollection<Word> collection, string value)
+        {
+            var word = collection.SingleOrDefault(x => _wordComparisonStrategy.IsMatch(x, value));
+            if (word == null)
+            {
+                word = new Word(value);
+                collection.Add(word);
+            }
+            return word;
         }
     }
 }

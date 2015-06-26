@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CollectionAssertEx.cs" />
+    <Compile Include="DefaultWordComparisonStrategyTests.cs" />
     <Compile Include="LessonDispatcherTests.cs" />
     <Compile Include="VocabularyManagerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

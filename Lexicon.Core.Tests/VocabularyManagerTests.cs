@@ -16,23 +16,26 @@ namespace Lexicon.Core.Tests
         private VocabularyManager _vocabularyManager;
         private IImporter _importer;
         private IVocabularyRepository _vocabularyRepository;
+        private IWordComparisonStrategy _wordComparisonStrategy;
 
         [SetUp]
         public void SetUp()
         {
             _vocabularyRepository = Substitute.For<IVocabularyRepository>();
+            _wordComparisonStrategy = new DefaultWordComparisonStrategy();
             _importer = Substitute.For<IImporter>();
 
-            _vocabularyManager = new VocabularyManager(_vocabularyRepository, _importer);
+            _vocabularyManager = new VocabularyManager(_vocabularyRepository, _wordComparisonStrategy, _importer);
         }
 
         [Test]
         public void ctor_throws_ArgumentNullException_if_nulls_passed()
         {
-            Assert.Throws<ArgumentNullException>(() => new VocabularyManager(Substitute.For<IVocabularyRepository>(), null));
-            Assert.Throws<ArgumentNullException>(() => new VocabularyManager(null, Substitute.For<IImporter>()));
-            Assert.Throws<ArgumentNullException>(() => new VocabularyManager(Substitute.For<IVocabularyRepository>(), new IImporter[] { null }));
-            Assert.Throws<ArgumentNullException>(() => new VocabularyManager(Substitute.For<IVocabularyRepository>(), Substitute.For<IImporter>(), null, Substitute.For<IImporter>()));
+            Assert.Throws<ArgumentNullException>(() => new VocabularyManager(Substitute.For<IVocabularyRepository>(), Substitute.For<IWordComparisonStrategy>(), null));
+            Assert.Throws<ArgumentNullException>(() => new VocabularyManager(null, Substitute.For<IWordComparisonStrategy>(), Substitute.For<IImporter>()));
+            Assert.Throws<ArgumentNullException>(() => new VocabularyManager(Substitute.For<IVocabularyRepository>(), null, Substitute.For<IImporter>()));
+            Assert.Throws<ArgumentNullException>(() => new VocabularyManager(Substitute.For<IVocabularyRepository>(), Substitute.For<IWordComparisonStrategy>(), new IImporter[] { null }));
+            Assert.Throws<ArgumentNullException>(() => new VocabularyManager(Substitute.For<IVocabularyRepository>(), Substitute.For<IWordComparisonStrategy>(), Substitute.For<IImporter>(), null, Substitute.For<IImporter>()));
         }
 
         [Test]

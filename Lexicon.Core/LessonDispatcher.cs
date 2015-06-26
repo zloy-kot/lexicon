@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Lexicon.Common;
 
 namespace Lexicon.Core
@@ -10,11 +11,13 @@ namespace Lexicon.Core
     {
         Random _random = new Random();
         private readonly ILessonRepository _lessonRepository;
+        private readonly IWordComparisonStrategy _wordComparisonStrategy;
         ExerciseDirection _exerciseDirection = ExerciseDirection.NativeToForeign;
 
-        public LessonDispatcher(ILessonRepository lessonRepository)
+        public LessonDispatcher(ILessonRepository lessonRepository, IWordComparisonStrategy wordComparisonStrategy)
         {
-            _lessonRepository = lessonRepository;
+            _lessonRepository = Ensure.IsNotNull(lessonRepository);
+            _wordComparisonStrategy = Ensure.IsNotNull(wordComparisonStrategy);
 
             Lessons = new List<Lesson>();
         }
@@ -45,10 +48,9 @@ namespace Lexicon.Core
         {
             var pair = findWordPair(exercise.LessonId, exercise.WordPairId);
 
-            var testedWord = getCorrectAnswer(exercise.Direction, pair);
+            var correctAnswer = getCorrectAnswer(exercise.Direction, pair);
 
-            var correct = testedWord.Equals(exercise.Answer);
-
+            var correct = _wordComparisonStrategy.IsMatch(correctAnswer, exercise.Answer);
             return correct;
         }
 
@@ -57,12 +59,9 @@ namespace Lexicon.Core
             return Lessons.Single(x => x.Id == lessonId).Words.Single(x => x.PairId == pairId);
         }
 
-        private string getCorrectAnswer(ExerciseDirection direction, WordPair pair)
+        private Word getCorrectAnswer(ExerciseDirection direction, WordPair pair)
         {
-            if (direction == ExerciseDirection.NativeToForeign)
-                return pair.ForeignWord.Value;
-            else
-                return pair.NativeWord.Value;
+            return direction == ExerciseDirection.NativeToForeign ? pair.ForeignWord : pair.NativeWord;
         }
 
         public Exercise GetNextExercise()
