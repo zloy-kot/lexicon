@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 
 namespace Lexicon.SimpleTextStorage.Fetch
 {
@@ -18,6 +17,14 @@ namespace Lexicon.SimpleTextStorage.Fetch
         public override bool Equals(object obj)
         {
             return Equals((FetchResult)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (ObjectId.GetHashCode() * 397) ^ (ObjectBody != null ? ObjectBody.GetHashCode() : 0);
+            }
         }
 
         public bool Equals(FetchResult other)
