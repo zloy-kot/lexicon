@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lexicon.Core.Tests", "Lexic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lexicon.Common", "Lexicon.Common\Lexicon.Common.csproj", "{9AEF6E89-AF9F-43DD-850E-29CB050E38EE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lexicon.SimpleTextStorage", "Lexicon.SimpleTextStorage\Lexicon.SimpleTextStorage.csproj", "{FF052920-D195-4B88-982E-8ACF1EA884EC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lexicon.SimpleTextStorage.Tests", "Lexicon.SimpleTextStorage.Tests\Lexicon.SimpleTextStorage.Tests.csproj", "{3F3ED20A-53BD-4404-ADB8-E2B0CCF0A897}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,11 +33,20 @@ Global
 		{9AEF6E89-AF9F-43DD-850E-29CB050E38EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9AEF6E89-AF9F-43DD-850E-29CB050E38EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9AEF6E89-AF9F-43DD-850E-29CB050E38EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF052920-D195-4B88-982E-8ACF1EA884EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF052920-D195-4B88-982E-8ACF1EA884EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF052920-D195-4B88-982E-8ACF1EA884EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF052920-D195-4B88-982E-8ACF1EA884EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F3ED20A-53BD-4404-ADB8-E2B0CCF0A897}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F3ED20A-53BD-4404-ADB8-E2B0CCF0A897}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F3ED20A-53BD-4404-ADB8-E2B0CCF0A897}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F3ED20A-53BD-4404-ADB8-E2B0CCF0A897}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{82D70A53-5D6E-4491-B34A-59905EC8E526} = {99C7BEF7-09F6-4848-A61C-3C7D7DA9488E}
+		{3F3ED20A-53BD-4404-ADB8-E2B0CCF0A897} = {99C7BEF7-09F6-4848-A61C-3C7D7DA9488E}
 	EndGlobalSection
 EndGlobal

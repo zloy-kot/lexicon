@@ -2,7 +2,7 @@
 
 namespace Lexicon.Common
 {
-    public class Word
+    public class Word : IEntity
     {
         public Word(string value)
         {
