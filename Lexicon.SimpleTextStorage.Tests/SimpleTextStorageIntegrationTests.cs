@@ -20,7 +20,7 @@ namespace Lexicon.SimpleTextStorage.Tests
 
             var registry = new SerializerRegistry();
             registry.Register(new DummySerializer());
-            _storage = new SimpleTextStorage(_defaultPath, new TextFileModifier(), registry);
+            _storage = new SimpleTextStorage(_defaultPath, new TextFileAccessor(), registry);
         }
 
         [TearDown]

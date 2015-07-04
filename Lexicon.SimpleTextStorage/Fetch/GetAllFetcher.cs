@@ -4,8 +4,8 @@ namespace Lexicon.SimpleTextStorage.Fetch
 {
     internal class GetAllFetcher : FetcherBase
     {
-        public GetAllFetcher(string objectFilename, ITextFileModifier textFileReader, IObjectStringParser objectStringParser) 
-            : base(objectFilename, textFileReader, objectStringParser)
+        public GetAllFetcher(string objectFilename, ITextFileAccessor textFileAccessor, IObjectStringParser objectStringParser) 
+            : base(objectFilename, textFileAccessor, objectStringParser)
         {
             
         }

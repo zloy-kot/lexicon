@@ -1,25 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
 using Lexicon.Common;
 
-namespace Lexicon.SimpleTextStorage.Fetch
+namespace Lexicon.SimpleTextStorage.Persistence
 {
-    internal abstract class FetcherBase
+    internal class Persister
     {
         private readonly string _objectFilename;
         private readonly IObjectStringParser _objectStringParser;
         private readonly ITextFileAccessor _textFileAccessor;
 
-        protected FetcherBase(string objectFilename, ITextFileAccessor textFileAccessor, IObjectStringParser objectStringParser)
+        public Persister(string objectFilename, ITextFileAccessor textFileAccessor, IObjectStringParser objectStringParser)
         {
             _objectFilename = Ensure.IsNotNullNorWhiteSpace(objectFilename);
             _objectStringParser = Ensure.IsNotNull(objectStringParser);
             _textFileAccessor = Ensure.IsNotNull(textFileAccessor);
         }
 
-        protected virtual IList<FetchResult> FetchInternal(object condition)
+        public void Persist(long id, string objString)
         {
-            IList<FetchResult> result = new List<FetchResult>();
             try
             {
                 _textFileAccessor.Open(_objectFilename);
@@ -39,21 +37,11 @@ namespace Lexicon.SimpleTextStorage.Fetch
                     if (String.IsNullOrWhiteSpace(line)) continue;
                     lineNo++;
                     long readId = _objectStringParser.ExtractObjectId(line, lineNo);
-                    var objStr = _objectStringParser.ExtractObjectString(line, lineNo);
-
-                    bool fetchComplete;
-                    try
+                    if (readId == id)
                     {
-                        var matches = TestLine(readId, objStr, condition, out fetchComplete);
-                        if (matches)
-                            result.Add(new FetchResult(readId, objStr));
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new SimpleTextException(SimpleTextExceptionReason.LineFetchingFailure, "Failed to fetch the object string", ex);
-                    }
-                    if (fetchComplete)
+                        _textFileAccessor.UpdateLine(objString);
                         break;
+                    }
                 }
             }
             catch (SimpleTextException)
@@ -62,15 +50,12 @@ namespace Lexicon.SimpleTextStorage.Fetch
             }
             catch (Exception ex)
             {
-                throw new SimpleTextException(SimpleTextExceptionReason.LineReadingFailure, "Failed to read the file", ex);
+                throw new SimpleTextException(SimpleTextExceptionReason.LineReadingFailure, "Failed to modify the file", ex);
             }
             finally
             {
                 _textFileAccessor.Close();
-            }
-            return result;
+            }   
         }
-
-        protected abstract bool TestLine(long objId, string objBody, object condition, out bool fetchComplete);
     }
 }
