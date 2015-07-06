@@ -43,6 +43,7 @@
     <Compile Include="Fetch\FetchResult.cs" />
     <Compile Include="Fetch\GetAllFetcher.cs" />
     <Compile Include="Fetch\GetByIdFetcher.cs" />
+    <Compile Include="Fetch\GetByConditionFetcher.cs" />
     <Compile Include="ISimpleSerializer.cs" />
     <Compile Include="ObjectStringParser.cs" />
     <Compile Include="SerializerRegistry.cs" />

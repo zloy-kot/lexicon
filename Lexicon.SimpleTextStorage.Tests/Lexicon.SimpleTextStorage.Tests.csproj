@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConcreteFetchersTests.cs" />
     <Compile Include="FetcherBaseTests.cs" />
     <Compile Include="TestSerializers.cs" />
     <Compile Include="SerializerRegistryTests.cs" />
