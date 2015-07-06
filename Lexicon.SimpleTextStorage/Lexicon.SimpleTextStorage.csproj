@@ -40,12 +40,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Fetch\FetcherBase.cs" />
-    <Compile Include="Fetch\FetchResult.cs" />
+    <Compile Include="AccessItem.cs" />
     <Compile Include="Fetch\GetAllFetcher.cs" />
+    <Compile Include="Fetch\GetByConditionFetcher.cs" />
     <Compile Include="Fetch\GetByIdFetcher.cs" />
+    <Compile Include="IAccessorRegistry.cs" />
+    <Compile Include="Impl\AccessorRegistry.cs" />
     <Compile Include="ISimpleSerializer.cs" />
     <Compile Include="ObjectStringParser.cs" />
-    <Compile Include="Persistence\Persister.cs" />
+    <Compile Include="Persistence\AddItemPersister.cs" />
+    <Compile Include="Persistence\ModifyByIdPersister.cs" />
+    <Compile Include="Persistence\PersisterBase.cs" />
     <Compile Include="SerializerRegistry.cs" />
     <Compile Include="SimpleTextException.cs" />
     <Compile Include="SimpleTextStorage.cs" />

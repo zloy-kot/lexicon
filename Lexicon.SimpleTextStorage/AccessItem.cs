@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace Lexicon.SimpleTextStorage.Fetch
+namespace Lexicon.SimpleTextStorage
 {
-    internal class FetchResult : IEquatable<FetchResult>
+    internal class AccessItem : IEquatable<AccessItem>
     {
-        public FetchResult(long objectId, string objectBody)
+        public AccessItem(long objectId, string objectBody)
         {
             ObjectId = objectId;
             ObjectBody = objectBody;
@@ -16,7 +16,7 @@ namespace Lexicon.SimpleTextStorage.Fetch
 
         public override bool Equals(object obj)
         {
-            return Equals((FetchResult)obj);
+            return Equals((AccessItem)obj);
         }
 
         public override int GetHashCode()
@@ -27,7 +27,7 @@ namespace Lexicon.SimpleTextStorage.Fetch
             }
         }
 
-        public bool Equals(FetchResult other)
+        public bool Equals(AccessItem other)
         {
             if (other == null)
                 return false;

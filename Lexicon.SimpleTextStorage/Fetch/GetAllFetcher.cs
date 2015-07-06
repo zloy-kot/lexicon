@@ -10,7 +10,7 @@ namespace Lexicon.SimpleTextStorage.Fetch
             
         }
 
-        public IList<FetchResult> Fetch()
+        public IList<AccessItem> Fetch()
         {
             return FetchInternal(null);
         }

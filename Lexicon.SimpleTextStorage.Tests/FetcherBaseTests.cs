@@ -40,15 +40,15 @@ namespace Lexicon.SimpleTextStorage.Tests
         }
 
         [Test]
-        public void When_text_file_service_reads_whitespaces_Fetch_returns_empty_list()
+        public void When_text_file_service_reads_whitespaces_Fetch_jums_to_the_next_line_and_retruns_empty_list()
         {
-            _textFileAccessor.ReadLine().Returns("\t   \t ");
+            _textFileAccessor.ReadLine().Returns("\t   \t ", (string)null);
 
             var actual = _fetcher.Fetch();
 
             Assert.IsNotNull(actual);
             CollectionAssert.IsEmpty(actual);
-            _textFileAccessor.Received(1).ReadLine();
+            _textFileAccessor.Received(2).ReadLine();
         }
 
         [Test]
@@ -117,12 +117,12 @@ namespace Lexicon.SimpleTextStorage.Tests
         [Test]
         public void When_text_file_service_reads_correct_line_Fetch_asks_whether_to_include_the_line_into_the_final_result()
         {
-            _textFileAccessor.ReadLine().Returns("[12]test", "[13]quest", "[16]thing", "[18]state", "[21]option", String.Empty);
+            _textFileAccessor.ReadLine().Returns("[12]test", "[13]quest", "[16]thing", "[18]state", "[21]option", (string)null);
             _fetcher.SetTestLineResults(false, true, true, false, true);
 
             var actual1 = _fetcher.Fetch();
 
-            CollectionAssertEx.ContainsOnly(actual1, new FetchResult(13, "quest"), new FetchResult(16, "thing"), new FetchResult(21, "option"));
+            CollectionAssertEx.ContainsOnly(actual1, new AccessItem(13, "quest"), new AccessItem(16, "thing"), new AccessItem(21, "option"));
         }
 
         [Test]
@@ -134,7 +134,7 @@ namespace Lexicon.SimpleTextStorage.Tests
 
             var actual1 = _fetcher.Fetch();
 
-            CollectionAssertEx.ContainsOnly(actual1, new FetchResult(13, "quest"), new FetchResult(16, "thing"));
+            CollectionAssertEx.ContainsOnly(actual1, new AccessItem(13, "quest"), new AccessItem(16, "thing"));
         }
     }
 
@@ -151,7 +151,7 @@ namespace Lexicon.SimpleTextStorage.Tests
             _complements = new[] { false };
         }
 
-        public IList<FetchResult> Fetch()
+        public IList<AccessItem> Fetch()
         {
             return FetchInternal(null);
         }

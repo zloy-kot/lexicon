@@ -6,7 +6,8 @@ namespace Lexicon.SimpleTextStorage
     public interface IObjectStringParser
     {
         long ExtractObjectId(string line, int lineNo);
-        string ExtractObjectString(string line, int lineNo);
+        string ExtractObjectBody(string line, int lineNo);
+        string BuildObjectString(long id, string body);
     }
 
     public class ObjectStringParser : IObjectStringParser
@@ -28,7 +29,7 @@ namespace Lexicon.SimpleTextStorage
             return readId;
         }
 
-        public string ExtractObjectString(string line, int lineNo)
+        public string ExtractObjectBody(string line, int lineNo)
         {
             Ensure.IsNotNullNorWhiteSpace(line);
 
@@ -39,6 +40,11 @@ namespace Lexicon.SimpleTextStorage
             if (String.IsNullOrWhiteSpace(res))
                 throw new SimpleTextException(SimpleTextExceptionReason.MissedObjectData, String.Format("Cannot find object data at line {0}", lineNo));
             return res;
-        } 
+        }
+
+        public string BuildObjectString(long id, string body)
+        {
+            return String.Format("[{0}]{1}", id, body);
+        }
     }
 }

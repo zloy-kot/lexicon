@@ -9,7 +9,7 @@ namespace Lexicon.SimpleTextStorage.Fetch
         {
         }
 
-        public FetchResult Fetch(long soughtId)
+        public AccessItem Fetch(long soughtId)
         {
             var result = FetchInternal(soughtId);
             return result.FirstOrDefault();

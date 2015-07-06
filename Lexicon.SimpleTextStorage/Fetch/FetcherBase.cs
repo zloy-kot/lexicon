@@ -17,9 +17,9 @@ namespace Lexicon.SimpleTextStorage.Fetch
             _textFileAccessor = Ensure.IsNotNull(textFileAccessor);
         }
 
-        protected virtual IList<FetchResult> FetchInternal(object condition)
+        protected virtual IList<AccessItem> FetchInternal(object condition)
         {
-            IList<FetchResult> result = new List<FetchResult>();
+            IList<AccessItem> result = new List<AccessItem>();
             try
             {
                 _textFileAccessor.Open(_objectFilename);
@@ -36,17 +36,18 @@ namespace Lexicon.SimpleTextStorage.Fetch
                 string line;
                 while ((line = _textFileAccessor.ReadLine()) != null)
                 {
-                    if (String.IsNullOrWhiteSpace(line)) continue;
                     lineNo++;
+                    if (String.IsNullOrWhiteSpace(line)) continue;
+
                     long readId = _objectStringParser.ExtractObjectId(line, lineNo);
-                    var objStr = _objectStringParser.ExtractObjectString(line, lineNo);
+                    var objStr = _objectStringParser.ExtractObjectBody(line, lineNo);
 
                     bool fetchComplete;
                     try
                     {
                         var matches = TestLine(readId, objStr, condition, out fetchComplete);
                         if (matches)
-                            result.Add(new FetchResult(readId, objStr));
+                            result.Add(new AccessItem(readId, objStr));
                     }
                     catch (Exception ex)
                     {

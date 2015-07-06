@@ -13,7 +13,7 @@ namespace Lexicon.SimpleTextStorage
 
         public Word GetWord(long id)
         {
-            return _storage.GetObject<Word>(id);
+            return _storage.GetOne<Word>(id);
         }
     }
 }
