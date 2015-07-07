@@ -54,6 +54,7 @@
     <Compile Include="SimpleTextStorageIntegrationTests.cs" />
     <Compile Include="SimpleTextStorageTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TextFileAccessorComponentTests.cs" />
     <Compile Include="TextSerializerBaseTests.cs" />
   </ItemGroup>
   <ItemGroup>

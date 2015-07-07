@@ -35,6 +35,16 @@ namespace Lexicon.SimpleTextStorage
             _encoding = Ensure.IsNotNull(encoding);
         }
 
+        internal long CurrentPosition
+        {
+            get
+            {
+                if (_disposed)
+                    throw new ObjectDisposedException("FileStream");
+                return _stream.Position;
+            }
+        }
+
         public void Open(string filename)
         {
             Ensure.IsNotNullNorWhiteSpace(filename);
