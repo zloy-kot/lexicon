@@ -5,8 +5,8 @@ namespace Lexicon.SimpleTextStorage.Fetch
 {
     internal class GetByConditionFetcher : FetcherBase
     {
-        public GetByConditionFetcher(string objectFilename, ITextFileModifier textFileModifier, IObjectStringParser objectStringParser)
-            : base(objectFilename, textFileModifier, objectStringParser)
+        public GetByConditionFetcher(string objectFilename, ITextFileAccessor textFileAccessor, IObjectStringParser objectStringParser)
+            : base(objectFilename, textFileAccessor, objectStringParser)
         {
         }
 
@@ -22,7 +22,7 @@ namespace Lexicon.SimpleTextStorage.Fetch
             long current = ((__state)condition).current;
             if (((__state)condition).testFunc(current, objId, objBody))
             {
-                ((__state) condition).current = objId;
+                ((__state)condition).current = objId;
                 return true;
             }
             return false;

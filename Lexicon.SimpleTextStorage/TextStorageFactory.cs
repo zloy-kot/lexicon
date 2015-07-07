@@ -4,18 +4,18 @@ namespace Lexicon.SimpleTextStorage
 {
     public class TextStorageFactory
     {
-        private readonly ITextFileModifier _textFileReader;
+        private readonly ITextFileAccessor _textFileAccessor;
         private readonly ISerializerRegistry _serializerRegistry;
 
-        public TextStorageFactory(ITextFileModifier textFileReader, ISerializerRegistry serializerRegistry)
+        public TextStorageFactory(ITextFileAccessor textFileAccessor, ISerializerRegistry serializerRegistry)
         {
-            _textFileReader = Ensure.IsNotNull(textFileReader);
+            _textFileAccessor = Ensure.IsNotNull(textFileAccessor);
             _serializerRegistry = Ensure.IsNotNull(serializerRegistry);
         }
 
         public SimpleTextStorage Create(string objectFilename)
         {
-            return new SimpleTextStorage(objectFilename, _textFileReader, _serializerRegistry);
+            return new SimpleTextStorage(objectFilename, _textFileAccessor, _serializerRegistry);
         }
     }
 }

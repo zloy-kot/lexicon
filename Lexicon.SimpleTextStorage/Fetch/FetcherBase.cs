@@ -8,25 +8,25 @@ namespace Lexicon.SimpleTextStorage.Fetch
     {
         private readonly string _objectFilename;
         private readonly IObjectStringParser _objectStringParser;
-        private readonly ITextFileModifier _textFileReader;
+        private readonly ITextFileAccessor _textFileAccessor;
 
-        protected FetcherBase(string objectFilename, ITextFileModifier textFileReader, IObjectStringParser objectStringParser)
+        protected FetcherBase(string objectFilename, ITextFileAccessor textFileAccessor, IObjectStringParser objectStringParser)
         {
             _objectFilename = Ensure.IsNotNullNorWhiteSpace(objectFilename);
             _objectStringParser = Ensure.IsNotNull(objectStringParser);
-            _textFileReader = Ensure.IsNotNull(textFileReader);
+            _textFileAccessor = Ensure.IsNotNull(textFileAccessor);
         }
 
-        protected virtual IList<FetchResult> FetchInternal(object condition)
+        protected virtual IList<AccessItem> FetchInternal(object condition)
         {
-            IList<FetchResult> result = new List<FetchResult>();
+            IList<AccessItem> result = new List<AccessItem>();
             try
             {
-                _textFileReader.Open(_objectFilename);
+                _textFileAccessor.Open(_objectFilename);
             }
             catch (Exception ex)
             {
-                _textFileReader.Close();
+                _textFileAccessor.Close();
                 throw new SimpleTextException(SimpleTextExceptionReason.FileOpenningFailure, "Failed to open the file", ex);
             }
             try
@@ -34,18 +34,20 @@ namespace Lexicon.SimpleTextStorage.Fetch
 
                 int lineNo = 0;
                 string line;
-                while (!String.IsNullOrWhiteSpace(line = _textFileReader.ReadLine()))
+                while ((line = _textFileAccessor.ReadLine()) != null)
                 {
                     lineNo++;
+                    if (String.IsNullOrWhiteSpace(line)) continue;
+
                     long readId = _objectStringParser.ExtractObjectId(line, lineNo);
-                    var objStr = _objectStringParser.ExtractObjectString(line, lineNo);
+                    var objStr = _objectStringParser.ExtractObjectBody(line, lineNo);
 
                     bool fetchComplete;
                     try
                     {
                         var matches = TestLine(readId, objStr, condition, out fetchComplete);
                         if (matches)
-                            result.Add(new FetchResult(readId, objStr));
+                            result.Add(new AccessItem(readId, objStr));
                     }
                     catch (Exception ex)
                     {
@@ -65,7 +67,7 @@ namespace Lexicon.SimpleTextStorage.Fetch
             }
             finally
             {
-                _textFileReader.Close();
+                _textFileAccessor.Close();
             }
             return result;
         }

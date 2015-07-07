@@ -28,6 +28,8 @@ namespace Lexicon.SimpleTextStorage
     {
         FileOpenningFailure,
         LineReadingFailure,
+        LineModificationFailure,
+        LinePersistenceFailure,
         LineFetchingFailure,
         MissedObjectId,
         CorruptedObjectId,

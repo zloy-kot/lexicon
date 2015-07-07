@@ -4,12 +4,12 @@ namespace Lexicon.SimpleTextStorage.Fetch
 {
     internal class GetByIdFetcher : FetcherBase
     {
-        public GetByIdFetcher(string objectFilename, ITextFileModifier textFileReader, IObjectStringParser objectStringParser)
-            : base(objectFilename, textFileReader, objectStringParser)
+        public GetByIdFetcher(string objectFilename, ITextFileAccessor textFileAccessor, IObjectStringParser objectStringParser)
+            : base(objectFilename, textFileAccessor, objectStringParser)
         {
         }
 
-        public FetchResult Fetch(long soughtId)
+        public AccessItem Fetch(long soughtId)
         {
             var result = FetchInternal(soughtId);
             return result.FirstOrDefault();
