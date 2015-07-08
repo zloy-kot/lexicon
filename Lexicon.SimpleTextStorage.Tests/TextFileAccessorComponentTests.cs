@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Text;
 using NSubstitute;
 using NUnit.Framework;
 
@@ -116,22 +115,27 @@ namespace Lexicon.SimpleTextStorage.Tests
         }
 
         [Test]
-        public void consecutive_ReadLine_calls_returns_strings_in_the_right_order()
+        public void consecutive_ReadLine_calls_returns_strings_in_the_right_order_seeking_to_the_next_line_after_each_reading()
         {
-            File.AppendAllText(_defaultPath, "someting\r\nnewline\r\nanother\r\ntest");
+            string initLine1 = "someting\r\n", initLine2 = "newline\r\n", initLine3 = "another\r\n", initLine4 = "test";
+            File.AppendAllText(_defaultPath, initLine1 + initLine2 + initLine3 + initLine4);
             _textFileAccessor.Open(_defaultPath);
 
             var line1 = _textFileAccessor.ReadLine();
             Assert.AreEqual("someting", line1);
+            Assert.AreEqual(initLine1.Length, _textFileAccessor.CurrentPosition);
 
             var line2 = _textFileAccessor.ReadLine();
             Assert.AreEqual("newline", line2);
+            Assert.AreEqual(initLine1.Length + initLine2.Length, _textFileAccessor.CurrentPosition);
 
             var line3 = _textFileAccessor.ReadLine();
             Assert.AreEqual("another", line3);
+            Assert.AreEqual(initLine1.Length + initLine2.Length + initLine3.Length, _textFileAccessor.CurrentPosition);
 
             var line4 = _textFileAccessor.ReadLine();
             Assert.AreEqual("test", line4);
+            Assert.AreEqual(initLine1.Length + initLine2.Length + initLine3.Length + initLine4.Length, _textFileAccessor.CurrentPosition);
         }
 
         [Test]
@@ -283,27 +287,32 @@ namespace Lexicon.SimpleTextStorage.Tests
         }
 
         [Test]
-        public void AddLine_adds_a_line_to_the_end_if_the_file_is_empty()
+        public void AddLine_adds_a_line_to_the_end_if_the_file_is_empty_and_seeks_to_the_end()
         {
+            var line = "some test";
             File.AppendAllText(_defaultPath, String.Empty);
             _textFileAccessor.Open(_defaultPath);
 
-            _textFileAccessor.AddLine("some test");
+            _textFileAccessor.AddLine(line);
+            var curPos = _textFileAccessor.CurrentPosition;
 
             _textFileAccessor.Dispose();
 
             var lines = File.ReadAllLines(_defaultPath);
             Assert.AreEqual(1, lines.Length);
             Assert.AreEqual("some test", lines[0]);
+            Assert.AreEqual(line.Length, curPos);
         }
 
         [Test]
-        public void AddLine_adds_a_line_to_the_end_if_the_file_is_not_empty()
+        public void AddLine_adds_a_line_to_the_end_if_the_file_is_not_empty_and_seeks_to_the_end()
         {
-            File.AppendAllText(_defaultPath, "some test\r\nanother line");
+            string line1 = "some test\r\nanother line", line2 = "new string";
+            File.AppendAllText(_defaultPath, line1);
             _textFileAccessor.Open(_defaultPath);
 
-            _textFileAccessor.AddLine("new string");
+            _textFileAccessor.AddLine(line2);
+            var curPos = _textFileAccessor.CurrentPosition;
 
             _textFileAccessor.Dispose();
 
@@ -312,15 +321,18 @@ namespace Lexicon.SimpleTextStorage.Tests
             Assert.AreEqual("some test", lines[0]);
             Assert.AreEqual("another line", lines[1]);
             Assert.AreEqual("new string", lines[2]);
+            Assert.AreEqual((line1 + line2 + Environment.NewLine).Length, curPos);
         }
 
         [Test]
-        public void AddLine_adds_a_line_to_the_end_if_the_file_is_not_empty_and_ends_with_eol()
+        public void AddLine_adds_a_line_to_the_end_if_the_file_is_not_empty_and_ends_with_eol_and_seeks_to_the_end()
         {
-            File.AppendAllText(_defaultPath, "some test\r\nanother line\r\n");
+            string line1 = "some test\r\nanother line\r\n", line2 = "new string";
+            File.AppendAllText(_defaultPath, line1);
             _textFileAccessor.Open(_defaultPath);
 
-            _textFileAccessor.AddLine("new string");
+            _textFileAccessor.AddLine(line2);
+            var curPos = _textFileAccessor.CurrentPosition;
 
             _textFileAccessor.Dispose();
 
@@ -329,20 +341,24 @@ namespace Lexicon.SimpleTextStorage.Tests
             Assert.AreEqual("some test", lines[0]);
             Assert.AreEqual("another line", lines[1]);
             Assert.AreEqual("new string", lines[2]);
+            Assert.AreEqual((line1 + line2).Length, curPos);
         }
 
         [Test]
-        public void AddLine_adds_newline_only_when_an_empty_string_is_passed()
+        public void AddLine_adds_just_newline_when_an_empty_string_is_passed_and_seeks_to_the_end()
         {
-            File.AppendAllText(_defaultPath, "some test\r\nanother line");
+            var line = "some test\r\nanother line";
+            File.AppendAllText(_defaultPath, line);
             _textFileAccessor.Open(_defaultPath);
 
             _textFileAccessor.AddLine(String.Empty);
+            var curPos = _textFileAccessor.CurrentPosition;
 
             _textFileAccessor.Dispose();
 
             var lines = File.ReadAllText(_defaultPath);
             Assert.AreEqual("some test\r\nanother line\r\n", lines);
+            Assert.AreEqual((line + Environment.NewLine).Length, curPos);
         }
 
         [Test]
@@ -374,12 +390,14 @@ namespace Lexicon.SimpleTextStorage.Tests
         }
 
         [Test]
-        public void UpdateLine_adds_a_line_if_the_file_is_empty()
+        public void UpdateLine_adds_a_line_if_the_file_is_empty_and_seeks_to_the_end()
         {
             File.AppendAllText(_defaultPath, String.Empty);
             _textFileAccessor.Open(_defaultPath);
 
-            _textFileAccessor.UpdateLine("some line");
+            var line = "some line";
+            _textFileAccessor.UpdateLine(line);
+            var curPos = _textFileAccessor.CurrentPosition;
 
             _textFileAccessor.Dispose();
 
@@ -387,15 +405,18 @@ namespace Lexicon.SimpleTextStorage.Tests
             Assert.IsNotNull(actual);
             Assert.AreEqual(1, actual.Length);
             Assert.AreEqual("some line", actual[0]);
+            Assert.AreEqual(line.Length, curPos);
         }
 
         [Test]
-        public void UpdateLine_updates_the_line_if_the_file_has_only_newline_symbol()
+        public void UpdateLine_updates_the_line_if_the_file_has_only_newline_symbol_and_seeks_to_the_end()
         {
             File.AppendAllText(_defaultPath, "\r\n");
             _textFileAccessor.Open(_defaultPath);
 
-            _textFileAccessor.UpdateLine("some line");
+            var line = "some line";
+            _textFileAccessor.UpdateLine(line);
+            var curPos = _textFileAccessor.CurrentPosition;
 
             _textFileAccessor.Dispose();
 
@@ -403,16 +424,19 @@ namespace Lexicon.SimpleTextStorage.Tests
             Assert.IsNotNull(actual);
             Assert.AreEqual(1, actual.Length);
             Assert.AreEqual("some line", actual[0]);
+            Assert.AreEqual(line.Length, curPos);
         }
 
         [Test]
-        public void UpdateLine_adds_the_line_to_the_end_of_the_file_if_current_position_is_in_the_end_of_the_file()
+        public void UpdateLine_adds_the_line_to_the_end_of_the_file_if_current_position_is_in_the_end_of_the_file_and_seeks_to_the_end()
         {
-            File.AppendAllText(_defaultPath, "other line");
+            string line1 = "other line", line2 = "some line";
+            File.AppendAllText(_defaultPath, line1);
             _textFileAccessor.Open(_defaultPath);
 
             _textFileAccessor.SeekLines(10);
-            _textFileAccessor.UpdateLine("some line");
+            _textFileAccessor.UpdateLine(line2);
+            var curPos = _textFileAccessor.CurrentPosition;
 
             _textFileAccessor.Dispose();
 
@@ -421,16 +445,19 @@ namespace Lexicon.SimpleTextStorage.Tests
             Assert.AreEqual(2, actual.Length);
             Assert.AreEqual("other line", actual[0]);
             Assert.AreEqual("some line", actual[1]);
+            Assert.AreEqual((line1 + line2 + Environment.NewLine).Length, curPos);
         }
         
         [Test]
-        public void UpdateLine_adds_the_line_to_the_end_of_the_file_if_current_position_is_in_the_end_of_the_file_and_the_file_ends_with_eol()
+        public void UpdateLine_adds_the_line_to_the_end_of_the_file_if_current_position_is_in_the_end_of_the_file_and_the_file_ends_with_eol_and_seeks_to_the_end()
         {
-            File.AppendAllText(_defaultPath, "other line\r\n");
+            string line1 = "other line\r\n", line2 = "some line";
+            File.AppendAllText(_defaultPath, line1);
             _textFileAccessor.Open(_defaultPath);
 
             _textFileAccessor.SeekLines(10);
-            _textFileAccessor.UpdateLine("some line");
+            _textFileAccessor.UpdateLine(line2);
+            var curPos = _textFileAccessor.CurrentPosition;
 
             _textFileAccessor.Dispose();
 
@@ -439,16 +466,19 @@ namespace Lexicon.SimpleTextStorage.Tests
             Assert.AreEqual(2, actual.Length);
             Assert.AreEqual("other line", actual[0]);
             Assert.AreEqual("some line", actual[1]);
+            Assert.AreEqual((line1 + line2).Length, curPos);
         }
 
         [Test]
-        public void UpdateLine_updates_a_line_at_the_current_position_when_existing_line_is_longer_then_the_new_one()
+        public void UpdateLine_updates_a_line_at_the_current_position_when_existing_line_is_longer_then_the_new_one_and_seeks_to_the_beginning_of_the_next_line()
         {
-            File.AppendAllText(_defaultPath, "other line\r\nsome line\r\none more line");
+            string init = "other line\r\n", newline = "test";
+            File.AppendAllText(_defaultPath, init + "some line\r\none more line");
             _textFileAccessor.Open(_defaultPath);
 
             _textFileAccessor.SeekLines(1);
-            _textFileAccessor.UpdateLine("test");
+            _textFileAccessor.UpdateLine(newline);
+            var curPos = _textFileAccessor.CurrentPosition;
 
             _textFileAccessor.Dispose();
 
@@ -458,6 +488,7 @@ namespace Lexicon.SimpleTextStorage.Tests
             Assert.AreEqual("other line", actual[0]);
             Assert.AreEqual("test", actual[1]);
             Assert.AreEqual("one more line", actual[2]);
+            Assert.AreEqual((init + newline + Environment.NewLine).Length, curPos);
         }
 
         [Test]
@@ -480,12 +511,14 @@ namespace Lexicon.SimpleTextStorage.Tests
         }
 
         [Test]
-        public void UpdateLine_updates_the_first_line_when_existing_line_is_longer_then_the_new_one()
+        public void UpdateLine_updates_the_first_line_when_existing_line_is_longer_then_the_new_one_and_seeks_to_the_beginning_of_the_next_line()
         {
+            var newline = "test";
             File.AppendAllText(_defaultPath, "other line\r\nsome line\r\none more line");
             _textFileAccessor.Open(_defaultPath);
 
-            _textFileAccessor.UpdateLine("test");
+            _textFileAccessor.UpdateLine(newline);
+            var curPos = _textFileAccessor.CurrentPosition;
 
             _textFileAccessor.Dispose();
 
@@ -495,6 +528,7 @@ namespace Lexicon.SimpleTextStorage.Tests
             Assert.AreEqual("test", actual[0]);
             Assert.AreEqual("some line", actual[1]);
             Assert.AreEqual("one more line", actual[2]);
+            Assert.AreEqual((newline + Environment.NewLine).Length, curPos);
         }
 
         [Test]
@@ -516,13 +550,15 @@ namespace Lexicon.SimpleTextStorage.Tests
         }
 
         [Test]
-        public void UpdateLine_updates_the_last_line_when_existing_line_is_longer_then_the_new_one()
+        public void UpdateLine_updates_the_last_line_when_existing_line_is_longer_then_the_new_one_and_seeks_to_the_end()
         {
-            File.AppendAllText(_defaultPath, "other line\r\nsome line\r\none more line");
+            string line1 = "other line\r\nsome line\r\n", line2 = "one more line", newline = "test";
+            File.AppendAllText(_defaultPath, line1 + line2);
             _textFileAccessor.Open(_defaultPath);
 
             _textFileAccessor.SeekLines(2);
-            _textFileAccessor.UpdateLine("test");
+            _textFileAccessor.UpdateLine(newline);
+            var curPos = _textFileAccessor.CurrentPosition;
 
             _textFileAccessor.Dispose();
 
@@ -532,6 +568,7 @@ namespace Lexicon.SimpleTextStorage.Tests
             Assert.AreEqual("other line", actual[0]);
             Assert.AreEqual("some line", actual[1]);
             Assert.AreEqual("test", actual[2]);
+            Assert.AreEqual((line1 + newline).Length, curPos);
         }
 
         [Test]
