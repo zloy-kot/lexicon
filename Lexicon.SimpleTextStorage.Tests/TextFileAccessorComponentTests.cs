@@ -273,5 +273,104 @@ namespace Lexicon.SimpleTextStorage.Tests
             Assert.AreEqual(0, pos);
             Assert.AreEqual("some test", _textFileAccessor.ReadLine());
         }
+
+        [Test]
+        public void AddLine_throws_ObjectDisposedException_when_target_has_been_disposed_of()
+        {
+            _textFileAccessor.Dispose();
+
+            Assert.Throws<ObjectDisposedException>(() => _textFileAccessor.AddLine("something"));
+        }
+
+        [Test]
+        public void AddLine_adds_a_line_to_the_end_if_the_file_is_empty()
+        {
+            File.AppendAllText(_defaultPath, String.Empty);
+            _textFileAccessor.Open(_defaultPath);
+
+            _textFileAccessor.AddLine("some test");
+
+            _textFileAccessor.Dispose();
+
+            var lines = File.ReadAllLines(_defaultPath);
+            Assert.AreEqual(1, lines.Length);
+            Assert.AreEqual("some test", lines[0]);
+        }
+
+        [Test]
+        public void AddLine_adds_a_line_to_the_end_if_the_file_is_not_empty()
+        {
+            File.AppendAllText(_defaultPath, "some test\r\nanother line");
+            _textFileAccessor.Open(_defaultPath);
+
+            _textFileAccessor.AddLine("new string");
+
+            _textFileAccessor.Dispose();
+
+            var lines = File.ReadAllLines(_defaultPath);
+            Assert.AreEqual(3, lines.Length);
+            Assert.AreEqual("some test", lines[0]);
+            Assert.AreEqual("another line", lines[1]);
+            Assert.AreEqual("new string", lines[2]);
+        }
+
+        [Test]
+        public void AddLine_adds_a_line_to_the_end_if_the_file_is_not_empty_and_ends_with_eol()
+        {
+            File.AppendAllText(_defaultPath, "some test\r\nanother line\r\n");
+            _textFileAccessor.Open(_defaultPath);
+
+            _textFileAccessor.AddLine("new string");
+
+            _textFileAccessor.Dispose();
+
+            var lines = File.ReadAllLines(_defaultPath);
+            Assert.AreEqual(3, lines.Length);
+            Assert.AreEqual("some test", lines[0]);
+            Assert.AreEqual("another line", lines[1]);
+            Assert.AreEqual("new string", lines[2]);
+        }
+
+        [Test]
+        public void AddLine_adds_newline_only_when_an_empty_string_is_passed()
+        {
+            File.AppendAllText(_defaultPath, "some test\r\nanother line");
+            _textFileAccessor.Open(_defaultPath);
+
+            _textFileAccessor.AddLine(String.Empty);
+
+            _textFileAccessor.Dispose();
+
+            var lines = File.ReadAllText(_defaultPath);
+            Assert.AreEqual("some test\r\nanother line\r\n", lines);
+        }
+
+        [Test]
+        public void AddLine_throws_ArgumentNullException_when_null_is_passed()
+        {
+            File.AppendAllText(_defaultPath, String.Empty);
+            _textFileAccessor.Open(_defaultPath);
+
+            Assert.Throws<ArgumentNullException>(() => _textFileAccessor.AddLine(null));
+        }
+
+        [Test]
+        public void UpdateLine_throws_ObjectDisposedException_when_target_has_been_disposed_of()
+        {
+            _textFileAccessor.Dispose();
+
+            Assert.Throws<ObjectDisposedException>(() => _textFileAccessor.UpdateLine("something"));
+        }
+
+        [Test]
+        public void UpdateLine_throws_ArgumentNullException_when_null_or_empty_string_is_passed()
+        {
+            File.AppendAllText(_defaultPath, String.Empty);
+            _textFileAccessor.Open(_defaultPath);
+
+            Assert.Throws<ArgumentNullException>(() => _textFileAccessor.UpdateLine(null));
+
+            Assert.Throws<ArgumentNullException>(() => _textFileAccessor.UpdateLine(String.Empty));
+        }
     }
 }
