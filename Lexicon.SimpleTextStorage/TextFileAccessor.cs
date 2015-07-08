@@ -260,8 +260,10 @@ namespace Lexicon.SimpleTextStorage
 
             //if the position is in the end
             if (_stream.Position == _stream.Length)
-            {//just append the line
-                AddLine(line);
+            {
+                //and the line is not empty append the line
+                if (!String.IsNullOrEmpty(line))
+                    AddLine(line);
                 return;
             }
 

@@ -552,5 +552,106 @@ namespace Lexicon.SimpleTextStorage.Tests
             Assert.AreEqual("some line", actual[1]);
             Assert.AreEqual("some new quite long line", actual[2]);
         }
+
+        [Test]
+        public void RemoveLine_does_nothing_when_the_file_is_empty()
+        {
+            File.AppendAllText(_defaultPath, String.Empty);
+            _textFileAccessor.Open(_defaultPath);
+
+            _textFileAccessor.RemoveLine();
+
+            Assert.AreEqual(0, _textFileAccessor.CurrentPosition);
+        }
+
+        [Test]
+        public void RemoveLine_does_nothing_when_current_position_is_in_the_end_of_the_file()
+        {
+            var init = "other line\r\nsome line\r\none more line";
+            File.AppendAllText(_defaultPath, init);
+            _textFileAccessor.Open(_defaultPath);
+
+            _textFileAccessor.SeekLines(10);
+            _textFileAccessor.RemoveLine();
+
+            Assert.AreEqual(init.Length, _textFileAccessor.CurrentPosition);
+        }
+
+        [Test]
+        public void RemoveLine_does_nothing_when_current_position_is_in_the_end_of_the_file_and_the_file_ends_with_eol()
+        {
+            var init = "other line\r\nsome line\r\none more line\r\n";
+            File.AppendAllText(_defaultPath, init);
+            _textFileAccessor.Open(_defaultPath);
+
+            _textFileAccessor.SeekLines(10);
+            _textFileAccessor.RemoveLine();
+
+            Assert.AreEqual(init.Length, _textFileAccessor.CurrentPosition);
+        }
+
+        [Test]
+        public void RemoveLine_removes_the_first_line_and_seeks_to_the_beginning()
+        {
+            var init = "other line\r\nsome line\r\none more line\r\n";
+            File.AppendAllText(_defaultPath, init);
+            _textFileAccessor.Open(_defaultPath);
+
+            _textFileAccessor.RemoveLine();
+
+            var curPos = _textFileAccessor.CurrentPosition;
+            _textFileAccessor.Dispose();
+
+            var actual = File.ReadAllLines(_defaultPath);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(2, actual.Length);
+            Assert.AreEqual("some line", actual[0]);
+            Assert.AreEqual("one more line", actual[1]);
+            Assert.AreEqual(0, curPos);
+        }
+
+        [Test]
+        public void RemoveLine_removes_the_last_line_and_seeks_to_the_end()
+        {
+            var expected = "other line\r\nsome line\r\n";
+            var init = expected + "one more line\r\n";
+            File.AppendAllText(_defaultPath, init);
+            _textFileAccessor.Open(_defaultPath);
+
+            _textFileAccessor.SeekLines(2);
+            _textFileAccessor.RemoveLine();
+
+            var curPos = _textFileAccessor.CurrentPosition;
+            _textFileAccessor.Dispose();
+
+            var actual = File.ReadAllLines(_defaultPath);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(2, actual.Length);
+            Assert.AreEqual("other line", actual[0]);
+            Assert.AreEqual("some line", actual[1]);
+            Assert.AreEqual(expected.Length, curPos);
+        }
+
+        [Test]
+        public void RemoveLine_removes_a_line_at_the_current_position_and_seeks_to_the_beginning_of_the_next_line()
+        {
+            var expected = "other line\r\n";
+            var init = expected + "some line\r\none more line\r\n";
+            File.AppendAllText(_defaultPath, init);
+            _textFileAccessor.Open(_defaultPath);
+
+            _textFileAccessor.SeekLines(1);
+            _textFileAccessor.RemoveLine();
+
+            var curPos = _textFileAccessor.CurrentPosition;
+            _textFileAccessor.Dispose();
+
+            var actual = File.ReadAllLines(_defaultPath);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(2, actual.Length);
+            Assert.AreEqual("other line", actual[0]);
+            Assert.AreEqual("one more line", actual[1]);
+            Assert.AreEqual(expected.Length, curPos);
+        }
     }
 }
