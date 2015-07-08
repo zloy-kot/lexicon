@@ -160,13 +160,17 @@ namespace Lexicon.SimpleTextStorage
 
         public void AddLine(string line)
         {
+            Ensure.IsNotNull(line);
+
             if (_disposed)
                 throw new ObjectDisposedException("FileStream");
-
-            //end the line the the newline symbol
-            var buffer = _encoding.GetBytes(Environment.NewLine + line);
+            
             //go to the end of the stream
             _stream.Seek(0, SeekOrigin.End);
+            //end the line the the newline symbol
+            if (!IsPrecededWithEol())
+                line = Environment.NewLine + line;
+            var buffer = _encoding.GetBytes(line);
             //lengthen the stream to room new line
             _stream.SetLength(_stream.Length + buffer.Length);
 
@@ -215,6 +219,17 @@ namespace Lexicon.SimpleTextStorage
             return (@byte == '\n');
         }
 
+        private bool IsPrecededWithEol()
+        {
+            var initPos = _stream.Position;
+            if (initPos == 0)
+                return true;
+
+            _stream.Seek(-1, SeekOrigin.Current);
+            var @byte = _stream.ReadByte();
+            return (@byte == '\r' || @byte == '\n');
+        }
+
         private bool IsEof(int @byte)
         {
             return @byte == -1;
@@ -226,12 +241,19 @@ namespace Lexicon.SimpleTextStorage
                 buffer[i] = value;
         }
 
-        public void RemoveLine()
+        public void UpdateLine(string line)
         {
-            UpdateLine(String.Empty);
+            Ensure.IsNotNullNorEmpty(line);
+
+            UpdateLineInternal(line);
         }
 
-        public void UpdateLine(string line)
+        public void RemoveLine()
+        {
+            UpdateLineInternal(String.Empty);
+        }
+
+        private void UpdateLineInternal(string line)
         {
             if (_disposed)
                 throw new ObjectDisposedException("FileStream");

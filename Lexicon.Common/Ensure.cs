@@ -28,6 +28,14 @@ namespace Lexicon.Common
             return value;
         }
 
+        public static string IsNotNullNorEmpty(string value)
+        {
+            if (String.IsNullOrEmpty(value))
+                throw new ArgumentNullException();
+
+            return value;
+        }
+
         public static string IsNotNullNorWhiteSpace(string value)
         {
             if (String.IsNullOrWhiteSpace(value))
