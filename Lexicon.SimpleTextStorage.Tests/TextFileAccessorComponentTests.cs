@@ -372,5 +372,185 @@ namespace Lexicon.SimpleTextStorage.Tests
 
             Assert.Throws<ArgumentNullException>(() => _textFileAccessor.UpdateLine(String.Empty));
         }
+
+        [Test]
+        public void UpdateLine_adds_a_line_if_the_file_is_empty()
+        {
+            File.AppendAllText(_defaultPath, String.Empty);
+            _textFileAccessor.Open(_defaultPath);
+
+            _textFileAccessor.UpdateLine("some line");
+
+            _textFileAccessor.Dispose();
+
+            var actual = File.ReadAllLines(_defaultPath);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(1, actual.Length);
+            Assert.AreEqual("some line", actual[0]);
+        }
+
+        [Test]
+        public void UpdateLine_updates_the_line_if_the_file_has_only_newline_symbol()
+        {
+            File.AppendAllText(_defaultPath, "\r\n");
+            _textFileAccessor.Open(_defaultPath);
+
+            _textFileAccessor.UpdateLine("some line");
+
+            _textFileAccessor.Dispose();
+
+            var actual = File.ReadAllLines(_defaultPath);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(1, actual.Length);
+            Assert.AreEqual("some line", actual[0]);
+        }
+
+        [Test]
+        public void UpdateLine_adds_the_line_to_the_end_of_the_file_if_current_position_is_in_the_end_of_the_file()
+        {
+            File.AppendAllText(_defaultPath, "other line");
+            _textFileAccessor.Open(_defaultPath);
+
+            _textFileAccessor.SeekLines(10);
+            _textFileAccessor.UpdateLine("some line");
+
+            _textFileAccessor.Dispose();
+
+            var actual = File.ReadAllLines(_defaultPath);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(2, actual.Length);
+            Assert.AreEqual("other line", actual[0]);
+            Assert.AreEqual("some line", actual[1]);
+        }
+        
+        [Test]
+        public void UpdateLine_adds_the_line_to_the_end_of_the_file_if_current_position_is_in_the_end_of_the_file_and_the_file_ends_with_eol()
+        {
+            File.AppendAllText(_defaultPath, "other line\r\n");
+            _textFileAccessor.Open(_defaultPath);
+
+            _textFileAccessor.SeekLines(10);
+            _textFileAccessor.UpdateLine("some line");
+
+            _textFileAccessor.Dispose();
+
+            var actual = File.ReadAllLines(_defaultPath);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(2, actual.Length);
+            Assert.AreEqual("other line", actual[0]);
+            Assert.AreEqual("some line", actual[1]);
+        }
+
+        [Test]
+        public void UpdateLine_updates_a_line_at_the_current_position_when_existing_line_is_longer_then_the_new_one()
+        {
+            File.AppendAllText(_defaultPath, "other line\r\nsome line\r\none more line");
+            _textFileAccessor.Open(_defaultPath);
+
+            _textFileAccessor.SeekLines(1);
+            _textFileAccessor.UpdateLine("test");
+
+            _textFileAccessor.Dispose();
+
+            var actual = File.ReadAllLines(_defaultPath);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(3, actual.Length);
+            Assert.AreEqual("other line", actual[0]);
+            Assert.AreEqual("test", actual[1]);
+            Assert.AreEqual("one more line", actual[2]);
+        }
+
+        [Test]
+        public void UpdateLine_updates_a_line_at_the_current_position_when_existing_line_is_shorter_then_the_new_one()
+        {
+            File.AppendAllText(_defaultPath, "other line\r\nsome line\r\none more line");
+            _textFileAccessor.Open(_defaultPath);
+
+            _textFileAccessor.SeekLines(1);
+            _textFileAccessor.UpdateLine("some new quite long line");
+
+            _textFileAccessor.Dispose();
+
+            var actual = File.ReadAllLines(_defaultPath);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(3, actual.Length);
+            Assert.AreEqual("other line", actual[0]);
+            Assert.AreEqual("some new quite long line", actual[1]);
+            Assert.AreEqual("one more line", actual[2]);
+        }
+
+        [Test]
+        public void UpdateLine_updates_the_first_line_when_existing_line_is_longer_then_the_new_one()
+        {
+            File.AppendAllText(_defaultPath, "other line\r\nsome line\r\none more line");
+            _textFileAccessor.Open(_defaultPath);
+
+            _textFileAccessor.UpdateLine("test");
+
+            _textFileAccessor.Dispose();
+
+            var actual = File.ReadAllLines(_defaultPath);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(3, actual.Length);
+            Assert.AreEqual("test", actual[0]);
+            Assert.AreEqual("some line", actual[1]);
+            Assert.AreEqual("one more line", actual[2]);
+        }
+
+        [Test]
+        public void UpdateLine_updates_the_first_line_when_existing_line_is_shorter_then_the_new_one()
+        {
+            File.AppendAllText(_defaultPath, "other line\r\nsome line\r\none more line");
+            _textFileAccessor.Open(_defaultPath);
+
+            _textFileAccessor.UpdateLine("some new quite long line");
+
+            _textFileAccessor.Dispose();
+
+            var actual = File.ReadAllLines(_defaultPath);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(3, actual.Length);
+            Assert.AreEqual("some new quite long line", actual[0]);
+            Assert.AreEqual("some line", actual[1]);
+            Assert.AreEqual("one more line", actual[2]);
+        }
+
+        [Test]
+        public void UpdateLine_updates_the_last_line_when_existing_line_is_longer_then_the_new_one()
+        {
+            File.AppendAllText(_defaultPath, "other line\r\nsome line\r\none more line");
+            _textFileAccessor.Open(_defaultPath);
+
+            _textFileAccessor.SeekLines(2);
+            _textFileAccessor.UpdateLine("test");
+
+            _textFileAccessor.Dispose();
+
+            var actual = File.ReadAllLines(_defaultPath);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(3, actual.Length);
+            Assert.AreEqual("other line", actual[0]);
+            Assert.AreEqual("some line", actual[1]);
+            Assert.AreEqual("test", actual[2]);
+        }
+
+        [Test]
+        public void UpdateLine_updates_the_last_line_when_existing_line_is_shorter_then_the_new_one()
+        {
+            File.AppendAllText(_defaultPath, "other line\r\nsome line\r\none more line");
+            _textFileAccessor.Open(_defaultPath);
+
+            _textFileAccessor.SeekLines(2);
+            _textFileAccessor.UpdateLine("some new quite long line");
+
+            _textFileAccessor.Dispose();
+
+            var actual = File.ReadAllLines(_defaultPath);
+            Assert.IsNotNull(actual);
+            Assert.AreEqual(3, actual.Length);
+            Assert.AreEqual("other line", actual[0]);
+            Assert.AreEqual("some line", actual[1]);
+            Assert.AreEqual("some new quite long line", actual[2]);
+        }
     }
 }
